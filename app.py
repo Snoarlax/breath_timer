@@ -11,14 +11,16 @@ from gi.repository import AppIndicator3 as appindicator
 APPINDICATOR_ID = 'breath_timer'
 INTERVAL = 10
 BREATH_DURATION = 4
+OUT_ICON=os.path.dirname(os.path.realpath(__file__))+"/exhale.svg"
+IN_ICON=os.path.dirname(os.path.realpath(__file__))+"/breathe.svg"
 
 def breathe_in():
     print("Breathe in")
-    indicator.set_icon(os.path.abspath("breathe.svg"))
+    indicator.set_icon(IN_ICON)
 
 def breathe_out():
     print("Breathe out")
-    indicator.set_icon(os.path.abspath("exhale.svg"))
+    indicator.set_icon(OUT_ICON)
 
 def breathe_loop():
     while True:
@@ -28,6 +30,7 @@ def breathe_loop():
         time.sleep(INTERVAL-BREATH_DURATION)
 
 def quit_app(_):
+    print("Quitting...")
     gtk.main_quit()
 
 def get_menu():
@@ -41,11 +44,12 @@ def get_menu():
 
 def main():
     global indicator 
-    indicator = appindicator.Indicator.new(APPINDICATOR_ID, os.path.abspath("exhale.svg"), appindicator.IndicatorCategory.SYSTEM_SERVICES)
+    indicator = appindicator.Indicator.new(APPINDICATOR_ID, OUT_ICON, appindicator.IndicatorCategory.SYSTEM_SERVICES)
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
     indicator.set_menu(get_menu())
 
     breathing_thread = threading.Thread(target=breathe_loop)
+    breathing_thread.daemon = True
     breathing_thread.start()
 
     gtk.main()
